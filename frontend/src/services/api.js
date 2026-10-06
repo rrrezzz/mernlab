@@ -1,0 +1,51 @@
+import axios from "axios";
+
+// Create Axios instance with backend base URL and credentials enabled
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000",
+  withCredentials: true, // Crucial: sends & receives HttpOnly cookies automatically
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// API Service Methods
+export const registerCustomer = async (customerData) => {
+  const response = await api.post("/customers/register", customerData);
+  return response.data;
+};
+
+export const loginCustomer = async (credentials) => {
+  const response = await api.post("/customers/login", credentials);
+  return response.data;
+};
+
+export const getMyProfile = async () => {
+  const response = await api.get("/customers/me");
+  return response.data;
+};
+
+export const logoutCustomer = async () => {
+  const response = await api.post("/customers/logout");
+  return response.data;
+};
+
+// ─── PRODUCT SERVICE METHODS ──────────────────────────────────────────────────
+
+export const getProducts = async (params = {}) => {
+  // params: { search, category, sort }
+  const response = await api.get("/products", { params });
+  return response.data;
+};
+
+export const getProductById = async (id) => {
+  const response = await api.get(`/products/${id}`);
+  return response.data;
+};
+
+export const createProduct = async (productData) => {
+  const response = await api.post("/products", productData);
+  return response.data;
+};
+
+export default api;

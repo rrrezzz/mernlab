@@ -1,0 +1,14 @@
+{
+  "name": "shopkart-mern-lab",
+  "version": "1.0.0",
+  "description": "ShopKart Frontend Lab 02 - Login to Home Flow",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "backend": "node backend/index.js",
+    "seed": "npm --prefix backend run seed",
+    "build": "npm --prefix frontend run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
