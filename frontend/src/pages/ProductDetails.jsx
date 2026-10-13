@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Package } from "lucide-react";
-import { getProductById } from "../services/api";
+import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
+import {
+  getProductById,
+  getWishlist,
+  addToWishlist,
+  removeFromWishlist,
+} from "../services/api";
 
-const ProductDetails = () => {
+const ProductDetails = ({ user, onWishlistChange }) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isSavingWishlist, setIsSavingWishlist] = useState(false);
+  const [wishlistMsg, setWishlistMsg] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -39,6 +47,56 @@ const ProductDetails = () => {
     fetchProduct();
     return () => { mounted = false; };
   }, [id]);
+
+  useEffect(() => {
+    if (!user) {
+      setIsInWishlist(false);
+      return;
+    }
+    let mounted = true;
+    getWishlist()
+      .then((data) => {
+        if (mounted) {
+          const found = (data.wishlist || []).some((item) => item._id === id);
+          setIsInWishlist(found);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, [id, user]);
+
+  const handleWishlistToggle = async () => {
+    if (isSavingWishlist) return;
+    setIsSavingWishlist(true);
+    setWishlistMsg(null);
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(id);
+        setIsInWishlist(false);
+        if (onWishlistChange) onWishlistChange((prev) => Math.max(0, prev - 1));
+      } else {
+        await addToWishlist(id);
+        setIsInWishlist(true);
+        if (onWishlistChange) onWishlistChange((prev) => (prev || 0) + 1);
+      }
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        setIsInWishlist(true);
+      } else if (status === 401) {
+        setWishlistMsg("Please sign in to save products to your wishlist.");
+      } else {
+        setWishlistMsg(
+          err?.response?.data?.message || "Unable to save product. Please try again."
+        );
+      }
+    } finally {
+      setIsSavingWishlist(false);
+    }
+  };
 
   const formattedPrice = product
     ? new Intl.NumberFormat("en-IN", {
@@ -146,17 +204,46 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            {/* Add to Cart — UI only for this lab */}
-            <button
-              id="add-to-cart-btn"
-              data-testid="add-to-cart-btn"
-              className={`details-cart-btn ${isOutOfStock ? "details-cart-btn--disabled" : ""}`}
-              disabled={isOutOfStock}
-              onClick={() => alert("Cart functionality coming in Lab 04!")}
-            >
-              <ShoppingCart size={16} />
-              Add to Cart
-            </button>
+            {/* Action Buttons: Add to Cart & Wishlist */}
+            <div className="details-actions-row">
+              <button
+                id="add-to-cart-btn"
+                data-testid="add-to-cart-btn"
+                className={`details-cart-btn ${isOutOfStock ? "details-cart-btn--disabled" : ""}`}
+                disabled={isOutOfStock}
+                onClick={() => alert("Cart functionality coming in Lab 05!")}
+              >
+                <ShoppingCart size={16} />
+                Add to Cart
+              </button>
+
+              <button
+                id="details-wishlist-btn"
+                data-testid="details-wishlist-btn"
+                className={`details-wishlist-btn ${
+                  isInWishlist ? "details-wishlist-btn--saved" : ""
+                }`}
+                onClick={handleWishlistToggle}
+                disabled={isSavingWishlist}
+              >
+                <Heart
+                  size={16}
+                  fill={isInWishlist ? "currentColor" : "none"}
+                />
+                {isSavingWishlist
+                  ? "Saving..."
+                  : isInWishlist
+                  ? "♥ Added to Wishlist"
+                  : "♡ Add to Wishlist"}
+              </button>
+            </div>
+
+            {wishlistMsg && (
+              <p className="details-wishlist-feedback" role="alert">
+                {wishlistMsg}
+              </p>
+            )}
+
             {isOutOfStock && (
               <p className="details-oos-note">
                 This item is currently unavailable. Check back soon.

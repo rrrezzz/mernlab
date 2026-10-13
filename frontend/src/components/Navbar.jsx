@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, LogOut, LayoutGrid } from "lucide-react";
+import { LogOut, LayoutGrid, Heart, Home as HomeIcon } from "lucide-react";
 import { logoutCustomer } from "../services/api";
 
-const Navbar = ({ user, setUser }) => {
+const Navbar = ({ user, setUser, wishlistCount = 0 }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -34,10 +34,22 @@ const Navbar = ({ user, setUser }) => {
 
         {/* Right controls */}
         <nav className="navbar-actions">
-          {/* Catalogue link — always visible */}
-          <Link to="/products" className="nav-link nav-link-catalogue">
+          {/* Home link */}
+          <Link to="/home" className="nav-link nav-link-home" id="nav-home-link">
+            <HomeIcon size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
+            Home
+          </Link>
+
+          {/* Products link */}
+          <Link to="/products" className="nav-link nav-link-catalogue" id="nav-products-link">
             <LayoutGrid size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
-            Catalogue
+            Products
+          </Link>
+
+          {/* Wishlist link — with dynamic backend count */}
+          <Link to="/wishlist" className="nav-link nav-link-wishlist" id="nav-wishlist-link">
+            <Heart size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
+            Wishlist {user && typeof wishlistCount === "number" ? `(${wishlistCount})` : ""}
           </Link>
 
           {user ? (

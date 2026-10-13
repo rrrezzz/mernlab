@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const customerRoutes = require("./routes/customer.routes");
 const productRoutes = require("./routes/product.routes");
+const wishlistRoutes = require("./routes/wishlist.routes");
 const { seedProducts } = require("./seed");
 
 const app = express();
@@ -21,7 +22,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/customers", customerRoutes);
+app.use("/auth", customerRoutes); // Alias for auth routes compatibility
 app.use("/products", productRoutes);
+app.use("/wishlist", wishlistRoutes);
 
 const startServer = async () => {
   const PORT = process.env.PORT || 5000;

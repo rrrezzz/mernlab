@@ -6,10 +6,12 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
-import { getMyProfile } from "./services/api";
+import Wishlist from "./pages/Wishlist";
+import { getMyProfile, getWishlist } from "./services/api";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   // Restore authenticated customer profile on initial mount if cookie exists
   useEffect(() => {
@@ -18,10 +20,24 @@ function App() {
       .catch(() => setUser(null));
   }, []);
 
+  // Sync wishlist count from backend whenever user session changes
+  useEffect(() => {
+    if (user) {
+      getWishlist()
+        .then((data) => {
+          const count = typeof data.count === "number" ? data.count : (data.wishlist || []).length;
+          setWishlistCount(count);
+        })
+        .catch(() => setWishlistCount(0));
+    } else {
+      setWishlistCount(0);
+    }
+  }, [user]);
+
   return (
     <BrowserRouter>
       <div className="app-layout">
-        <Navbar user={user} setUser={setUser} />
+        <Navbar user={user} setUser={setUser} wishlistCount={wishlistCount} />
         <main className="main-content">
           <Routes>
             {/* Route Summary as per Lab Specifications */}
@@ -30,8 +46,20 @@ function App() {
             <Route path="/home" element={<Home user={user} setUser={setUser} />} />
 
             {/* Product Catalogue Routes */}
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route
+              path="/products"
+              element={<Products user={user} onWishlistChange={setWishlistCount} />}
+            />
+            <Route
+              path="/products/:id"
+              element={<ProductDetails user={user} onWishlistChange={setWishlistCount} />}
+            />
+
+            {/* Wishlist Route */}
+            <Route
+              path="/wishlist"
+              element={<Wishlist user={user} onWishlistChange={setWishlistCount} />}
+            />
 
             {/* Default Route redirects to /home */}
             <Route path="/" element={<Navigate to="/home" replace />} />
@@ -45,4 +73,3 @@ function App() {
 }
 
 export default App;
-

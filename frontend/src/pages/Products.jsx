@@ -2,17 +2,35 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Package } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
-import { getProducts } from "../services/api";
+import { getProducts, getWishlist } from "../services/api";
 
-const Products = () => {
+const Products = ({ user, onWishlistChange }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   // Filter / sort state
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("");
+
+  const fetchWishlistIds = useCallback(async () => {
+    if (!user) {
+      setWishlistIds(new Set());
+      return;
+    }
+    try {
+      const data = await getWishlist();
+      const ids = new Set((data.wishlist || []).map((item) => item._id));
+      setWishlistIds(ids);
+      if (onWishlistChange) {
+        onWishlistChange(ids.size);
+      }
+    } catch {
+      // Unauthenticated or wishlist fetch error — ignore silently on public catalog
+    }
+  }, [user, onWishlistChange]);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -35,6 +53,25 @@ const Products = () => {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  useEffect(() => {
+    fetchWishlistIds();
+  }, [fetchWishlistIds]);
+
+  const handleWishlistToggle = (productId, isAdded) => {
+    setWishlistIds((prev) => {
+      const next = new Set(prev);
+      if (isAdded) {
+        next.add(productId);
+      } else {
+        next.delete(productId);
+      }
+      if (onWishlistChange) {
+        onWishlistChange(next.size);
+      }
+      return next;
+    });
+  };
 
   return (
     <div className="products-page">
@@ -101,7 +138,12 @@ const Products = () => {
         {!loading && !error && products.length > 0 && (
           <div className="pcard-grid" id="products-grid" data-testid="products-grid">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard
+                key={product._id}
+                product={product}
+                initialInWishlist={wishlistIds.has(product._id)}
+                onWishlistToggle={handleWishlistToggle}
+              />
             ))}
           </div>
         )}
