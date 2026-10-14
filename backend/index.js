@@ -8,6 +8,7 @@ const cors = require("cors");
 const customerRoutes = require("./routes/customer.routes");
 const productRoutes = require("./routes/product.routes");
 const wishlistRoutes = require("./routes/wishlist.routes");
+const cartRoutes = require("./routes/cart.routes");
 const { seedProducts } = require("./seed");
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/customers", customerRoutes);
 app.use("/auth", customerRoutes); // Alias for auth routes compatibility
 app.use("/products", productRoutes);
 app.use("/wishlist", wishlistRoutes);
+app.use("/cart", cartRoutes);
 
 const startServer = async () => {
   const PORT = process.env.PORT || 5000;

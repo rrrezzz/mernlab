@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Wishlist from "./pages/Wishlist";
+import Cart from "./pages/Cart";
+import { CartProvider } from "./context/CartContext";
 import { getMyProfile, getWishlist } from "./services/api";
 
 function App() {
@@ -36,38 +38,46 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="app-layout">
-        <Navbar user={user} setUser={setUser} wishlistCount={wishlistCount} />
-        <main className="main-content">
-          <Routes>
-            {/* Route Summary as per Lab Specifications */}
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login setUser={setUser} />} />
-            <Route path="/home" element={<Home user={user} setUser={setUser} />} />
+      <CartProvider user={user}>
+        <div className="app-layout">
+          <Navbar user={user} setUser={setUser} wishlistCount={wishlistCount} />
+          <main className="main-content">
+            <Routes>
+              {/* Route Summary as per Lab Specifications */}
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login setUser={setUser} />} />
+              <Route path="/home" element={<Home user={user} setUser={setUser} />} />
 
-            {/* Product Catalogue Routes */}
-            <Route
-              path="/products"
-              element={<Products user={user} onWishlistChange={setWishlistCount} />}
-            />
-            <Route
-              path="/products/:id"
-              element={<ProductDetails user={user} onWishlistChange={setWishlistCount} />}
-            />
+              {/* Product Catalogue Routes */}
+              <Route
+                path="/products"
+                element={<Products user={user} onWishlistChange={setWishlistCount} />}
+              />
+              <Route
+                path="/products/:id"
+                element={<ProductDetails user={user} onWishlistChange={setWishlistCount} />}
+              />
 
-            {/* Wishlist Route */}
-            <Route
-              path="/wishlist"
-              element={<Wishlist user={user} onWishlistChange={setWishlistCount} />}
-            />
+              {/* Wishlist Route */}
+              <Route
+                path="/wishlist"
+                element={<Wishlist user={user} onWishlistChange={setWishlistCount} />}
+              />
 
-            {/* Default Route redirects to /home */}
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            {/* Catch-all unknown routes */}
-            <Route path="*" element={<Navigate to="/home" replace />} />
-          </Routes>
-        </main>
-      </div>
+              {/* Shopping Cart Route (Lab 05) */}
+              <Route
+                path="/cart"
+                element={<Cart user={user} />}
+              />
+
+              {/* Default Route redirects to /home */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              {/* Catch-all unknown routes */}
+              <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </CartProvider>
     </BrowserRouter>
   );
 }

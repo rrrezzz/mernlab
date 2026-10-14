@@ -1,10 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, LayoutGrid, Heart, Home as HomeIcon } from "lucide-react";
+import { LogOut, LayoutGrid, Heart, Home as HomeIcon, ShoppingBag } from "lucide-react";
 import { logoutCustomer } from "../services/api";
+import { useCart } from "../context/CartContext";
 
 const Navbar = ({ user, setUser, wishlistCount = 0 }) => {
   const navigate = useNavigate();
+  const { totalItems } = useCart();
 
   const handleLogout = async () => {
     try {
@@ -46,10 +48,16 @@ const Navbar = ({ user, setUser, wishlistCount = 0 }) => {
             Products
           </Link>
 
-          {/* Wishlist link — with dynamic backend count */}
+          {/* Wishlist link — with dynamic count */}
           <Link to="/wishlist" className="nav-link nav-link-wishlist" id="nav-wishlist-link">
             <Heart size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
             Wishlist {user && typeof wishlistCount === "number" ? `(${wishlistCount})` : ""}
+          </Link>
+
+          {/* Cart link — with dynamic global totalItems count */}
+          <Link to="/cart" className="nav-link nav-link-cart" id="nav-cart-link" data-testid="nav-cart-link">
+            <ShoppingBag size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
+            Cart {user && typeof totalItems === "number" ? `(${totalItems})` : ""}
           </Link>
 
           {user ? (

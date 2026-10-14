@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { addToWishlist, removeFromWishlist } from "../services/api";
+import { useCart } from "../context/CartContext";
 
 const ProductCard = ({ product, initialInWishlist = false, onWishlistToggle }) => {
   const navigate = useNavigate();
+  const { cartItems, addToCart, actionLoadingId } = useCart();
   const [isInWishlist, setIsInWishlist] = useState(initialInWishlist);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [cartError, setCartError] = useState(null);
 
   useEffect(() => {
     setIsInWishlist(initialInWishlist);
@@ -69,6 +72,22 @@ const ProductCard = ({ product, initialInWishlist = false, onWishlistToggle }) =
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const cartItemEntry = (cartItems || []).find(
+    (item) => (item.product?._id || item.product) === product._id
+  );
+  const isAddingToCart = actionLoadingId === product._id;
+
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+    if (isAddingToCart || isOutOfStock) return;
+    setCartError(null);
+    try {
+      await addToCart(product._id);
+    } catch (err) {
+      setCartError(err.message);
     }
   };
 
@@ -134,7 +153,13 @@ const ProductCard = ({ product, initialInWishlist = false, onWishlistToggle }) =
           </p>
         )}
 
-        {/* Action Button Row */}
+        {cartError && (
+          <p className="pcard-error-notice" role="alert">
+            {cartError}
+          </p>
+        )}
+
+        {/* Action Button Row: View Details & Wishlist */}
         <div className="pcard-actions-row">
           <button
             id={`view-product-${product._id}`}
@@ -157,10 +182,30 @@ const ProductCard = ({ product, initialInWishlist = false, onWishlistToggle }) =
             {isSaving
               ? "⏳ Saving..."
               : isInWishlist
-              ? "♥ Added to Wishlist"
-              : "♡ Add to Wishlist"}
+              ? "♥ In Wishlist"
+              : "♡ Wishlist"}
           </button>
         </div>
+
+        {/* Add to Cart Primary Button */}
+        <button
+          id={`add-to-cart-btn-${product._id}`}
+          data-testid="add-to-cart-btn"
+          className={`pcard-btn pcard-btn-cart ${
+            cartItemEntry ? "pcard-btn-cart--incart" : ""
+          }`}
+          onClick={handleAddToCart}
+          disabled={isOutOfStock || isAddingToCart}
+        >
+          <ShoppingBag size={14} style={{ marginRight: "0.35rem" }} />
+          {isOutOfStock
+            ? "Out of Stock"
+            : isAddingToCart
+            ? "Adding..."
+            : cartItemEntry
+            ? `Add Another (${cartItemEntry.quantity} in cart)`
+            : "Add to Cart"}
+        </button>
       </div>
     </article>
   );

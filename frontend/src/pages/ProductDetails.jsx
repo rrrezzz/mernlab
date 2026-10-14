@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Heart, CheckCircle2 } from "lucide-react";
 import {
   getProductById,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
 } from "../services/api";
+import { useCart } from "../context/CartContext";
 
 const ProductDetails = ({ user, onWishlistChange }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { cartItems, addToCart, actionLoadingId } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,6 +20,8 @@ const ProductDetails = ({ user, onWishlistChange }) => {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isSavingWishlist, setIsSavingWishlist] = useState(false);
   const [wishlistMsg, setWishlistMsg] = useState(null);
+  const [cartSuccessMsg, setCartSuccessMsg] = useState(null);
+  const [cartErrorMsg, setCartErrorMsg] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -95,6 +99,23 @@ const ProductDetails = ({ user, onWishlistChange }) => {
       }
     } finally {
       setIsSavingWishlist(false);
+    }
+  };
+
+  const cartItemEntry = (cartItems || []).find(
+    (item) => (item.product?._id || item.product) === id
+  );
+  const isAddingToCart = actionLoadingId === id;
+
+  const handleAddToCart = async () => {
+    if (isAddingToCart || isOutOfStock) return;
+    setCartSuccessMsg(null);
+    setCartErrorMsg(null);
+    try {
+      await addToCart(id);
+      setCartSuccessMsg("Product successfully added to your cart!");
+    } catch (err) {
+      setCartErrorMsg(err.message);
     }
   };
 
@@ -205,16 +226,23 @@ const ProductDetails = ({ user, onWishlistChange }) => {
             </div>
 
             {/* Action Buttons: Add to Cart & Wishlist */}
+            {/* Action Buttons: Add to Cart & Wishlist */}
             <div className="details-actions-row">
               <button
                 id="add-to-cart-btn"
                 data-testid="add-to-cart-btn"
                 className={`details-cart-btn ${isOutOfStock ? "details-cart-btn--disabled" : ""}`}
-                disabled={isOutOfStock}
-                onClick={() => alert("Cart functionality coming in Lab 05!")}
+                disabled={isOutOfStock || isAddingToCart}
+                onClick={handleAddToCart}
               >
                 <ShoppingCart size={16} />
-                Add to Cart
+                {isOutOfStock
+                  ? "Out of Stock"
+                  : isAddingToCart
+                  ? "Adding to Cart..."
+                  : cartItemEntry
+                  ? `Add Another (${cartItemEntry.quantity} in cart)`
+                  : "Add to Cart"}
               </button>
 
               <button
@@ -237,6 +265,19 @@ const ProductDetails = ({ user, onWishlistChange }) => {
                   : "♡ Add to Wishlist"}
               </button>
             </div>
+
+            {cartSuccessMsg && (
+              <p className="details-cart-success" role="status">
+                <CheckCircle2 size={14} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
+                {cartSuccessMsg}
+              </p>
+            )}
+
+            {cartErrorMsg && (
+              <p className="details-cart-error" role="alert">
+                {cartErrorMsg}
+              </p>
+            )}
 
             {wishlistMsg && (
               <p className="details-wishlist-feedback" role="alert">
