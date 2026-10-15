@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogOut, LayoutGrid, Heart, Home as HomeIcon, ShoppingBag } from "lucide-react";
+import { LogOut, LayoutGrid, Heart, Home as HomeIcon, ShoppingBag, Package } from "lucide-react";
 import { logoutCustomer } from "../services/api";
 import { useCart } from "../context/CartContext";
 
@@ -59,6 +59,13 @@ const Navbar = ({ user, setUser, wishlistCount = 0 }) => {
             <ShoppingBag size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
             Cart {user && typeof totalItems === "number" ? `(${totalItems})` : ""}
           </Link>
+
+          {user && (
+            <Link to="/orders" className="nav-link nav-link-orders" id="nav-orders-link">
+              <Package size={13} style={{ display: "inline", marginRight: "0.3rem", verticalAlign: "middle" }} />
+              My Orders
+            </Link>
+          )}
 
           {user ? (
             <div className="user-controls">

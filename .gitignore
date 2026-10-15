@@ -3,3 +3,5 @@ node_modules/
 .env.local
 dist/
 build/
+backend/.mongo-memory/
+backend/.mongo-diagnose/

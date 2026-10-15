@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { MongoMemoryServer } = require("mongodb-memory-server");
+const { createMemoryMongoServer, stopMemoryMongoServer } = require("./utils/memoryMongo");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const Customer = require("./models/customer.model");
@@ -12,11 +12,7 @@ async function runCartTests() {
   console.log("=== STARTING BACKEND CART TESTS ===");
 
   // 1. Setup in-memory MongoDB with generous startup timeout
-  const mongod = await MongoMemoryServer.create({
-    instance: {
-      startupTimeout: 60000,
-    },
-  });
+  const mongod = await createMemoryMongoServer();
   const uri = mongod.getUri();
   await mongoose.connect(uri);
   console.log("Connected to MongoMemoryServer at:", uri);
@@ -235,7 +231,7 @@ async function runCartTests() {
 
   server.close();
   await mongoose.disconnect();
-  await mongod.stop();
+  await stopMemoryMongoServer(mongod);
 
   if (failed > 0) {
     process.exit(1);

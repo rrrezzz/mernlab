@@ -9,7 +9,9 @@ const customerRoutes = require("./routes/customer.routes");
 const productRoutes = require("./routes/product.routes");
 const wishlistRoutes = require("./routes/wishlist.routes");
 const cartRoutes = require("./routes/cart.routes");
+const orderRoutes = require("./routes/order.routes");
 const { seedProducts } = require("./seed");
+const { createMemoryMongoServer } = require("./utils/memoryMongo");
 
 const app = express();
 
@@ -27,6 +29,7 @@ app.use("/auth", customerRoutes); // Alias for auth routes compatibility
 app.use("/products", productRoutes);
 app.use("/wishlist", wishlistRoutes);
 app.use("/cart", cartRoutes);
+app.use("/orders", orderRoutes);
 
 const startServer = async () => {
   const PORT = process.env.PORT || 5000;
@@ -45,8 +48,7 @@ const startServer = async () => {
     console.warn("MongoDB Atlas connection failed:", error.message);
     console.log("Starting in-memory MongoDB fallback for local development...");
     try {
-      const { MongoMemoryServer } = require("mongodb-memory-server");
-      const mongod = await MongoMemoryServer.create();
+      const mongod = await createMemoryMongoServer();
       const uri = mongod.getUri();
       await mongoose.connect(uri);
       console.log("In-memory MongoDB connected successfully at:", uri);

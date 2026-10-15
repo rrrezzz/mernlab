@@ -140,7 +140,7 @@ body {
 }
 
 /* Nav actions */
-.navbar-actions { display: flex; align-items: center; gap: 1.25rem; }
+.navbar-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1.25rem; }
 
 .auth-links { display: flex; align-items: center; gap: 1rem; }
 
@@ -2493,6 +2493,156 @@ body {
   .cart-summary-card {
     padding: 1.5rem;
   }
+}
+
+/* ─── CHECKOUT + ORDERS (LAB 06) ─────────────────────────────────────────── */
+.checkout-form-card {
+  background: var(--graphite);
+  border: 1px solid var(--border-subtle);
+  padding: 2rem 2.25rem;
+}
+
+.checkout-form {
+  gap: 1.15rem;
+}
+
+.checkout-summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.checkout-alert {
+  margin-bottom: 1.5rem;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 860px;
+}
+
+.order-card,
+.order-confirmation-card {
+  background: var(--graphite);
+  border: 1px solid var(--border-subtle);
+  padding: 1.75rem 2rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.order-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--ivory);
+  word-break: break-all;
+}
+
+.order-card-date {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.35rem;
+}
+
+.order-status {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--gold-border);
+  color: var(--gold-light);
+  white-space: nowrap;
+}
+
+.order-status--placed { color: var(--gold-light); }
+.order-status--confirmed { color: #7EC8B8; border-color: #1E5A4E; }
+.order-status--shipped { color: #D5B878; }
+.order-status--delivered { color: #7EC8B8; border-color: #1E5A4E; }
+.order-status--pending_payment { color: #E8A0A8; border-color: #6A2530; }
+
+.order-card-items {
+  list-style: none;
+  color: var(--stone);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.order-card-footer,
+.order-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.order-card-total {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--gold-light);
+}
+
+.order-details-btn,
+.order-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 0.75rem 1.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.order-secondary-btn {
+  background: transparent;
+  color: var(--ivory);
+  border: 1px solid var(--border-mid);
+  font-family: var(--font-sans);
+}
+
+.order-secondary-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold-light);
+}
+
+.order-success-mark {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  margin-bottom: 1.25rem;
+  color: var(--ivory);
+}
+
+.order-meta-line {
+  color: var(--stone);
+  margin-bottom: 0.45rem;
+}
+
+.order-shipping-block {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--stone);
+}
+
+.order-shipping-block h3 {
+  font-family: var(--font-serif);
+  color: var(--ivory);
+  font-weight: 400;
+  margin-bottom: 0.5rem;
 }
 
 

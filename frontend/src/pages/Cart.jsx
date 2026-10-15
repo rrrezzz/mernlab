@@ -197,7 +197,7 @@ const Cart = ({ user }) => {
                   id="checkout-button"
                   data-testid="checkout-button"
                   className="btn-gold-primary summary-checkout-btn"
-                  onClick={() => alert("Checkout flow is introduced in Lab 06!")}
+                  onClick={() => navigate("/checkout")}
                 >
                   Proceed to Checkout
                   <ArrowRight size={14} style={{ marginLeft: "0.5rem" }} />

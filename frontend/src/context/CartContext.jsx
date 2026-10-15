@@ -133,6 +133,10 @@ export const CartProvider = ({ children, user }) => {
     }, 0);
   }, [cartItems]);
 
+  const clearCart = useCallback(() => {
+    setCartItems([]);
+  }, []);
+
   const value = {
     cartItems,
     loading,
@@ -144,6 +148,7 @@ export const CartProvider = ({ children, user }) => {
     updateQuantity,
     removeFromCart,
     refreshCart,
+    clearCart,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
